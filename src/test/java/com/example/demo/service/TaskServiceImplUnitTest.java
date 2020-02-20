@@ -48,7 +48,7 @@ class TaskServiceImplUnitTest {
         List<Task> actualList= taskServiceImpl.findAll();
 
         // モックの指定メソッドの実行回数を検査
-        verify(dao, times(1)).findAll();
+        verify(dao, times(1)).findAll(); //確実に1回だけ呼び出されたことを確認する
 
         // 戻り値の検査(expected, actual)
         assertEquals(0, actualList.size());
@@ -83,14 +83,17 @@ class TaskServiceImplUnitTest {
     }
 
     @Test // テストケース
-    @DisplayName("タスクが取得できない場合のテスト")
+    @DisplayName("タスクが取得できない場合のテスト") //EmptyResultDataAccessExceptionの代わりにTaskNotFoundExceptionがスローされるか確認する
         // テスト名
     void testGetTaskThrowException() {
-    	
         // モッククラスのI/Oをセット
-        
+        when(dao.findById(0)).thenThrow(new EmptyResultDataAccessException(1));
         //タスクが取得できないとTaskNotFoundExceptionが発生することを検査
-        
+        try {
+        	Optional<Task> task0 = taskServiceImpl.getTask(0);
+        }catch(TaskNotFoundException e) {
+        	assertEquals(e.getMessage(), "指定されたタスクは存在しません");
+        }
     }
     
     @Test // テストケース
@@ -99,15 +102,16 @@ class TaskServiceImplUnitTest {
     void testGetTaskReturnOne() {
     	
     	//Taskをデフォルト値でインスタンス化
-    	
+    	Task task = new Task();
+    	Optional<Task> taskOpt = Optional.ofNullable(task); 
         // モッククラスのI/Oをセット
-
+    	when(dao.findById(1)).thenReturn(taskOpt);
         // サービスを実行
-
+    	Optional<Task> taskActual = taskServiceImpl.getTask(1);
         // モックの指定メソッドの実行回数を検査
-
+    	verify(dao, times(1)).findById(1);
         //Taskが存在していることを確認
-        
+        assertTrue(taskActual.isPresent());
     }
     
     @Test // テストケース　ユニットテストではデータベースの例外は考えない
@@ -116,9 +120,13 @@ class TaskServiceImplUnitTest {
     void throwNotFoundException() {
     	
         // モッククラスのI/Oをセット
-
+    	when(dao.deleteById(0)).thenReturn(0);
     	//削除対象が存在しない場合、例外が発生することを検査
-
+    	try {
+    		taskServiceImpl.deleteById(0);
+    	}catch(TaskNotFoundException e) {
+    		assertEquals(e.getMessage(), "削除するタスクが存在しません");
+    	}
     }
     
     

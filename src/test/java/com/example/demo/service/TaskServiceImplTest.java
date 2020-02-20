@@ -30,7 +30,7 @@ class TaskServiceImplTest {
         try {
         	Optional<Task> task = taskService.getTask(0);
         } catch (TaskNotFoundException e) {
-        	assertEquals(e.getMessage(), "指定されたタスクが存在しません");
+        	assertEquals(e.getMessage(), "指定されたタスクは存在しません");
         }
     }
 
@@ -38,9 +38,9 @@ class TaskServiceImplTest {
     @DisplayName("全件検索のテスト")
     void testFindAllCheckCount() {
     	//全件取得
-
-        //Taskテーブルに入っている2件が取得できているか確認
-    	
+    	List<Task> list = taskService.findAll();
+        //Taskテーブルに入っている2件が取得できているか確認 //今回data.sqlに2件書いているので2件が全件です
+    	assertEquals(2, list.size());
     }
     
     
@@ -48,8 +48,9 @@ class TaskServiceImplTest {
     @DisplayName("1件のタスクが取得できた場合のテスト")
     void testGetTaskFormReturnOne() {
     	//idが1のTaskを取得
-        
+        Optional<Task> taskOpt = taskService.getTask(1);
         //取得できたことを確認
+        assertEquals("JUnitを学習", taskOpt.get().getTitle());
     }
     
 

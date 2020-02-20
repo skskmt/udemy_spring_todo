@@ -11,7 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 public class TaskForm {
 
-    @Digits(integer = 1, fraction = 0)
+    @Digits(integer = 1, fraction = 0) //integer:1 一桁の整数 fraction:小数点以下
     private int typeId;
 
     @NotNull (message = "タイトルを入力してください。")
